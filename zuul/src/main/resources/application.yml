@@ -1,0 +1,45 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: eureka-zuul
+  #redis配置
+  redis:
+    jedis:
+      pool:
+        max-idle: 10
+        max-active: 10
+        min-idle: 5
+        max-wait: 2000
+    host: 114.115.217.85
+    port: 6379
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:7001/eureka/
+
+feign:
+  hystrix:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,hystrix.stream
+
+
+#指定ANT风格的URL匹配
+zuul:
+  routes:
+    #用户微服务映射规则
+    user-service:
+      path: /u/**
+      #指定映射服务用户地址，这样Zuul就会将请求转发到用户微服务上了
+      url: http://localhost:8090/
+    #产品微服务映射规则
+    product-service:
+      path: /p/**
+      #映射产品服务中心ID,Zuul会启动使用服务端负载均衡，分摊请求
+      serviceId: eureka-product
